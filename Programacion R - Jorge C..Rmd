@@ -1,0 +1,106 @@
+---
+title: "Programacion R Jorge C"
+output: html_document
+date: "2024-05-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Permisos de Circulación pagados en la Municipalidad de Calbuco realizados desde el 2023 al 2024
+
+### Objetivo
+
+El objetivo de esete análisis es poder predecir, mediante un modelo ML, la cantidad de pagos que se realizarán en los próximos 12 meses
+
+### Origen del Conjunto de Datos
+
+Estos datos son obtenidos del siguiente Directorio Publico
+
+<https://datos.gob.cl/dataset/1e3f6a55-78d6-4ad6-8df3-3dfaa057d824/resource/a447a1f2-b45c-4b36-a6bf-160190334333/download/permiso-de-circulacion-2018.xlsx>
+
+### Descripción de los Datos
+
+| Campo            | Tipo    | Descripción                                                                    |
+|------------------|---------|--------------------------------------------------------------------------------|
+| Municipalidad    | texto   | Nombre de la municipalidad donde se realizó el pago del permiso de circulación |
+| Grupo Vehículo   | texto   | Grupo del vehículo (Vehículo Liviano, Transporte Público, Carga)               |
+| Placa            | String  | Identificador único del vehículo                                               |
+| Dígito           | String  | Dígito verificador de la placa patente                                         |
+| Código SII       | String  | Código del Servicio de Impuestos Internos del pago                             |
+| Año Vehículo     | Integer | Año de fabricación del vehículo                                                |
+| Tasación         | Integer | Tasación del vehículo                                                          |
+| Tipo de Pago     | Integer | Tipo de pago del permiso (Presencial, Internet)                                |
+| Valor Neto       | Integer | Valor neto del pago del permiso                                                |
+| Valor IPC        | Integer | Valor IPC del pago del permiso                                                 |
+| Valor Multa      | Integer | Valor de la multa del pago del permiso                                         |
+| Valor Pagado     | Integer | Valor total pagado del permiso                                                 |
+| Forma Pago       | String  | Forma de pago del permiso                                                      |
+| Fecha Pago       | String  | Fecha de pago del permiso                                                      |
+| Año Permiso      | Integer | Año del permiso del pago                                                       |
+| Tipo Vehículo    | String  | Tipo de vehículo (Automóvil, Moto, Bus, Van, Furgón, entre otros)              |
+| Marca            | String  | Marca del vehículo                                                             |
+| Modelo           | String  | Modelo del vehículo                                                            |
+| Color            | String  | Color del vehículo                                                             |
+| Transmisión      | String  | Tipo de transmisión del vehículo (Mecánica, Automática, CVT, DCT)              |
+| Tipo Combustible | String  | Tipo de combustible del vehículo (Bencina, Diésel, Dual, Híbrido, Eléctrico)   |
+| Cilindrada       | Integer | Cilindrada del motor del vehículo                                              |
+| Equipamiento     | String  | Tipo de equipamiento del vehículo (Normal, Full)                               |
+| Número Puertas   | Integer | Número de puertas del vehículo                                                 |
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# Analisis Explotario
+
+### Definir Directorio
+
+```{r pressure, echo=FALSE}
+setwd("C:/UDLA/R/R")#diredtorio de R
+```
+
+### carga datos
+
+```{r pressure, echo=FALSE}
+permiso_circulacion <- read.csv("permiso_circulacion_2023_2024_calbuco.csv", 
+                        header = TRUE, 
+                        sep = ";")
+```
+
+cat("\\014") permiso_circulacion$Tasacion <- as.integer(permiso_circulacion$Tasacion)
+
+str(permiso_circulacion)
+
+var(clientes\$region)
+
+x= clientes\$MEJOR_RENTA median(x) \# interpretacion: el 50% de las ventas es de 40 dolares
+
+var(x) #computesthevarianceofthedatainx summary(x)#computesseveralsummarystatisticsonthedatain x length(x) #numberof elementsin x min(x) #minimumvalueofx max(x) #maximumvalueofx
+
+range(x) #differencebetweenmaximumandminimumof datain x IQR(x)
+
+pmin(x,y)#pairwiseminimaofcorrespondingelementsofxand y pmax(x,y)#pairwisemaximaof x andy boxplot(clientes\$MEJOR_RENTA)
+
+View(atenciones)
+
+hist(clientes\$region, breaks = "Sturges", include.lowest = TRUE, main = "Histograma",xlab = "edad",ylab = "Cantidad de Encuestados" )
+
+str(clientes)
+
+head(clientes)
+
+boxplot(clientes\$edad, horizontal = TRUE,col="blue")
+
+)View(clientes) boxplot(atenciones$Total ~ atenciones$GLOSATIPOESTABLECIMIENTO, data=atenciones
