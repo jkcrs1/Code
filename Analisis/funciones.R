@@ -196,7 +196,6 @@ grafico <- function(data, var, tipo_grafico) {
 
 
 
-
 grafico_dispersion <- function(data, var_x, var_y) {
   # Verificar si las variables son numéricas
   if (!is.numeric(data[[var_x]]) || !is.numeric(data[[var_y]])) {
@@ -210,6 +209,28 @@ grafico_dispersion <- function(data, var_x, var_y) {
   covarianza <- cov(data[[var_x]], data[[var_y]], use = "complete.obs")
   correlacion <- cor(data[[var_x]], data[[var_y]], use = "complete.obs")
   
+  # Evaluación de la relación
+  abs_correlacion <- abs(correlacion)
+  fuerza <- if (abs_correlacion < 0.1) {
+    "Correlación inexistente"
+  } else if (abs_correlacion < 0.3) {
+    "Correlación débil"
+  } else if (abs_correlacion < 0.5) {
+    "Correlación moderada"
+  } else {
+    "Correlación fuerte"
+  }
+  
+  direccion <- if (correlacion > 0) {
+    "relación positiva (directa)"
+  } else if (correlacion < 0) {
+    "relación negativa (inversa)"
+  } else {
+    "sin relación"
+  }
+  
+  evaluacion <- paste(fuerza, "con", direccion)
+  
   # Crear el gráfico de dispersión
   p <- ggplot(data, aes(x = !!sym(var_x), y = !!sym(var_y))) +
     geom_point(color = colores[1], alpha = 0.6) +
@@ -218,19 +239,19 @@ grafico_dispersion <- function(data, var_x, var_y) {
     labs(title = paste("Gráfico de Dispersión de", var_x, "vs", var_y),
          x = var_x,
          y = var_y,
-         caption = paste("Este gráfico de dispersión muestra la relación entre", var_x, "y", var_y, ".")) +
+         caption = paste("Este gráfico de dispersión muestra la relación entre", var_x, "y", var_y, "\nLa relaciòn es:", evaluacion)) +
     scale_x_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",")) +
     scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ","))
   
+  # Obtener los límites actuales del gráfico
+  xlim <- range(data[[var_x]], na.rm = TRUE)
+  ylim <- range(data[[var_y]], na.rm = TRUE)
+  
   # Añadir anotaciones de covarianza y correlación
-  p <- p + annotate("text", x = Inf, y = Inf, 
-                    label = paste("Covarianza:", round(covarianza, 2), "\nCorrelación:", round(correlacion, 2)),
-                    hjust = 1.1, vjust = 2, size = 5, color = "black", parse = FALSE)
+  p <- p + annotate("text", x = xlim[2], y = ylim[2], 
+                    label = paste("Covarianza:", round(covarianza, 6), "\nCorrelación:", round(correlacion, 6)),
+                    hjust = 1, vjust = 1, size = 3, color = "black") 
   
   # Mostrar el gráfico
   print(p)
 }
-
-
-
-
