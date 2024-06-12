@@ -57,23 +57,23 @@ cat("\014")
 
 # Cargar librerías necesarias
 library(dplyr)
-library(ggplot2)
-library(lubridate)
-library(scales)
-library(prophet)
+# library(ggplot2)  # No usada
+# library(lubridate)  # No usada
+# library(scales)  # No usada
+# library(prophet)  # No usada
 library(stringr)
-library(caret)
-library(corrplot)
-library(e1071)
-library(xgboost)
-library(ROSE)
-library(pROC)
-library(factoextra)
+# library(caret)  # No usada
+# library(corrplot)  # No usada
+# library(e1071)  # No usada
+# library(xgboost)  # No usada
+# library(ROSE)  # No usada
+# library(pROC)  # No usada
+# library(factoextra)  # No usada
 library(knitr)
 library(kableExtra)
 library(readxl)
 library(summarytools)
-library(htmltools)
+# library(htmltools)  # No usada
 
 ```
 
@@ -184,6 +184,18 @@ grafico(
 ```
 
 ```{r}
+
+
+
+# Generar algunos gráficos
+p1 <- grafico(estudiantes_data, "Sexo", "torta")
+p2 <- grafico(estudiantes_data, "Colegio", "anillo")
+
+grid_plot(p1, p2)
+
+```
+
+```{r}
 # Variables para gráficos
 var_x <- "Financiacion"
 var_tipo_grafico <- "anillo"
@@ -194,6 +206,16 @@ grafico(
   var  = var_x, 
   tipo_grafico = var_tipo_grafico)
 
+```
+
+```{r}
+
+# Generar algunos gráficos
+p1 <- grafico(estudiantes_data, "Ingreso", "boxplot")
+p2 <- grafico(estudiantes_data, "Gastos", "boxplot")
+p2 <- grafico(estudiantes_data, "Edad", "boxplot")
+
+grid_plot(p1, p2,p3)
 ```
 
 ```{r}
