@@ -12,30 +12,21 @@ for (pkg in required_packages) {
 
 lapply(required_packages, library, character.only = TRUE)
 
-
-
 tam.muestra <- function(alfa, epsilon, s, N = Inf) {
   za2 <- qnorm(1 - alfa / 2)
   n <- if (N == Inf) (s * za2 / epsilon)^2 else N * ((za2 * s)^2) / ((N - 1) * epsilon^2 + (za2 * s)^2)
   return(ceiling(n))
 }
 
-
-
 reemplazar_nulos <- function(x) {
   ifelse(x %in% c( "", "NULL", "Null", "null"), NA, x)
 }
-
-
 
 
 paleta_colores <- function() {
   colores <- paletteer::paletteer_d("ggthemes::Classic_10_Light")
   return(colores)
 }
-
-
-
 
 
 grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
@@ -79,6 +70,7 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
               },
               "barra" = ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) +
                 geom_bar() +
+                geom_text(stat='count', aes(label=..count..), angle = 90,  vjust = 0.5) +
                 labs(title = paste("Frecuencia de", var_cual_x), x = var_cual_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cual_x, ".")),
               stop(paste(tipo_grafico, " Tipo de gráfico no soportado."))
   )
@@ -191,7 +183,6 @@ grafico <- function(data, var, tipo_grafico) {
     stop("El tipo de variable no es soportado. Debe ser una variable cualitativa o cuantitativa.")
   }
 }
-
 
 
 
