@@ -1,30 +1,375 @@
 ---
-title: "EVALUACION_1 _ CACERES _ BARRALES"
+title: "Evaluacion_1_Jorge_Caceres"
 author: "jorge Cáceres Barrales"
 date: "2024-06-11"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Titulo
+
+# Objetivo
+
+## Descripcion de Variables
+
+Los datos fueron recogidos aplicando una encuesta a una muestra de estudiantes universitarios. Es un data frame con 400 observaciones y 18 variables, las cuales se describen abajo.
+
+```{r}
+data <- data.frame(
+  Variable = c("ID", "Sexo", "Edad", "Fuma", "Estatura", "Colegio", "Estrato", 
+               "Financiación", "Acumulado", "Gastos", "Ingreso", "Clases", 
+               "Pandemia", "Clases_virtuales", "Estadística", "Inseguridad", 
+               "Vida_cotidiana", "Puntaje"),
+  Significado = c("Código de identificación", "Género", "Edad", "Fuma", "Estatura", 
+                  "Tipo de colegio de procedencia", "Estrato socio-económico de su vivienda", 
+                  "¿Cuál fue tu medio de financiación para estudiar en la universidad?", 
+                  "Promedio acumulado al finalizar el semestre anterior", 
+                  "Promedio de sus gastos mensuales (en 10 miles de $)", 
+                  "Ingreso mensual de su padre (en millones de $)", "¿Qué tipo de clases prefiere?", 
+                  "Cree usted que la pandemia afectó económicamente a su familia", 
+                  "Me preocupa que tal vez no pueda entender los contenidos de mis asignaturas como me gustaría", 
+                  "Me gusta la estadística", "Me siento inseguro cuando hago problemas de estadística", 
+                  "Utilizo la estadística en la vida cotidiana", "Porcentaje de acierto en una determinada prueba"),
+  Codificación = c("Código de identificación", "Masculino, femenino", "Numérica de 12.0 a 30.0", 
+                   "Si=Fuma; No=No fuma", "Alta, Baja, Media", "Privado; Público", 
+                   "1=Bajo; 2=Medio; 3=Alto", "Beca; Crédito; Otro", "Numérica de 0.0 a 5.0", 
+                   "Numérica de 23.0 a 90.0", "Numérica de 1.0 a 3.0", "Virtual; Presencial", 
+                   "1= Totalmente de acuerdo; 2= En desacuerdo; 3= Ni de acuerdo, ni en desacuerdo; 4= De acuerdo; 5= Totalmente de acuerdo", 
+                   "1= Totalmente de acuerdo; 2= En desacuerdo; 3= Ni de acuerdo, ni en desacuerdo; 4= De acuerdo; 5= Totalmente de acuerdo", 
+                   "1= Totalmente de acuerdo; 2= En desacuerdo; 3= Indeciso; 4= De acuerdo; 5= Totalmente de acuerdo", 
+                   "1= Totalmente de acuerdo; 2= En desacuerdo; 3= Indeciso; 4= De acuerdo; 5= Totalmente de acuerdo", 
+                   "1= Totalmente de acuerdo; 2= En desacuerdo; 3= Indeciso; 4= De acuerdo; 5= Totalmente de acuerdo", 
+                   "Numérica de 0 a 100%")
+)
+
+kable(data, "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+                full_width = F) %>%
+  row_spec(0, bold = T, background = "#D3D3D3") %>%
+  row_spec(1:nrow(data), background = c("#F5F5F5", "#FFFFFF"))
 ```
 
-## R Markdown
+## Carga Librerias
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+carga de librerias necesarias para realizar el analisis de datos
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+cat("\014")
 
-```{r cars}
-summary(cars)
+# Cargar librerías necesarias
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(scales)
+library(prophet)
+library(stringr)
+library(caret)
+library(corrplot)
+library(e1071)
+library(xgboost)
+library(ROSE)
+library(pROC)
+library(factoextra)
+library(knitr)
+library(kableExtra)
+library(readxl)
+library(summarytools)
+library(htmltools)
+
 ```
 
-## Including Plots
+## Carga de Datos y Funciones
 
-You can also embed plots, for example:
+```{r}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# Enlace raw al archivo de funciones en GitHub
+source("https://raw.githubusercontent.com/jkcrs1/Code/main/Analisis/funciones.R")
+
+# Carga Archivo xlsx
+file_path <- "/Users/jorge/Documents/GitHub/Code/Analisis/Estudiantes.xlsx"
+estudiantes_data <- read_excel(file_path, sheet = "Estudiant")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Tipos de Variables
+
+```{r}
+# Configurar el entorno de summarytools para HTML
+st_options(style = "rmarkdown", plain.ascii = FALSE)
+
+# Obtener un resumen de los datos utilizando summarytools y renderizar en HTML
+dfSummary(estudiantes_data) %>%
+  print(method = 'render')
+```
+
+## Normalizacon de las variables
+
+```{r}
+
+
+# Aplicar todas las transformaciones y normalizaciones
+estudiantes_data <- estudiantes_data %>%
+  mutate(
+    across(everything(), reemplazar_nulos),
+    across(c(Sexo, Estatura, Fuma, Colegio, Financiacion, Clases, Pandemia, Clases_virtuales, Estadistica, inseguridad, vida_cotidiana), str_to_title)
+  ) %>%
+  mutate(
+    Edad = as.integer(Edad),
+    Acumulado = as.numeric(Acumulado),
+    Gastos = as.numeric(Gastos),
+    Ingreso = as.numeric(Ingreso)
+  ) %>%
+  distinct() 
+
+
+# Identificacion de Valores Nulos
+sum(is.na(estudiantes_data))
+
+
+# Valores nulos por columna:
+print(colSums(is.na(estudiantes_data)))
+
+
+print("Filas con valores nulos:")
+print(head(estudiantes_data %>% filter_all(any_vars(is.na(.)))))
+
+```
+
+## Seleccion de Variables Cuantitativa
+
+```{r}
+# Seleccionar tres variables cuantitativas
+cuanti_vars <- estudiantes_data %>% select(Edad, Gastos, Ingreso)
+
+# Crear un resumen de variables cuantitativas utilizando summarytools
+print(dfSummary(cuanti_vars), method = 'render')
+```
+
+## Seleccion de Variables Cualiitativa
+
+```{r}
+# Seleccionar cinco variables cualitativas
+cuali_vars <- estudiantes_data %>% select(Sexo, Colegio, Financiacion, Clases_virtuales, Pandemia)
+
+# Crear un resumen de variables cualitativas utilizando summarytools
+print(dfSummary(cuali_vars), method = 'render')
+```
+
+```{r}
+# Variables para gráficos
+var_x <- "Sexo"
+var_tipo_grafico <- "torta"
+
+# Gráfico de torta
+grafico(
+  data = estudiantes_data, 
+  var  = var_x, 
+  tipo_grafico = var_tipo_grafico
+)
+```
+
+### Interpretacion
+
+jajs
+
+```{r}
+# Variables para gráficos
+var_x <- "Colegio"
+var_tipo_grafico <- "anillo"
+
+# Gráfico de torta
+grafico(
+  data = estudiantes_data, 
+  var  = var_x, 
+  tipo_grafico = var_tipo_grafico
+)
+```
+
+```{r}
+# Variables para gráficos
+var_x <- "Financiacion"
+var_tipo_grafico <- "anillo"
+
+# Gráfico de torta
+grafico(
+  data = estudiantes_data, 
+  var  = var_x, 
+  tipo_grafico = var_tipo_grafico)
+
+```
+
+```{r}
+
+# Variables para gráficos
+data <- estudiantes_data 
+var_x <- "Ingreso"
+
+# Gráfico de Boxplot
+var_tipo_grafico <- "boxplot"
+grafico(
+  data = estudiantes_data, 
+  var  = var_x, 
+  tipo_grafico = var_tipo_grafico
+)
+
+```
+
+### Interpretación
+
+La mayoría de los estudiantes tienen entre 17 y 20 años, con una edad mediana de 18, una distribución sesgada a la derecha que indica una mayor concentración de edades entre 18 y 20 años. Ademas y varios valores atípicos por encima de los 24 años, lo que sugiere la presencia de algunos estudiantes significativamente mayores.
+
+```{r}
+# Variables para gráficos
+data <- estudiantes_data 
+var_x <- "Gastos"
+
+# Gráfico de Boxplot
+var_tipo_grafico <- "boxplot"
+grafico_cuantitativo(
+  data = data, 
+  var_cuant_x  = var_x, 
+  tipo_grafico = var_tipo_grafico
+)
+```
+
+```{r}
+# Variables para gráficos
+data <- estudiantes_data 
+var_x <- "Edad"
+
+# Gráfico de Boxplot
+var_tipo_grafico <- "boxplot"
+grafico(
+  data = estudiantes_data, 
+  var  = var_x, 
+  tipo_grafico = var_tipo_grafico
+)
+```
+
+```{r}
+
+var_x <- "Gastos"
+var_y <- "Ingreso"
+
+# Gráfico de torta
+var_tipo_grafico <- "dispercion"
+grafico_dispersion(
+  data = estudiantes_data, 
+  var_x = var_x, 
+  var_y = var_y
+)
+```
+
+```{r}
+
+# Crear una tabla de contingencia para las variables Financiacion y Clases
+tabla_contingencia <- table(estudiantes_data$Financiacion, estudiantes_data$Clases)
+
+# Mostrar la tabla de contingencia
+print(tabla_contingencia)
+
+```
+
+```{r}
+# Número total de estudiantes
+total_estudiantes <- nrow(estudiantes_data)
+
+# Número de estudiantes con beca y que prefieren clases virtuales
+beca_virtual <- sum(estudiantes_data$Financiacion == "Beca" & estudiantes_data$Clases == "Virtual")
+
+# Calcular la probabilidad
+prob_beca_virtual <- beca_virtual / total_estudiantes
+cat("Probabilidad de elegir a un estudiante con beca y que prefiera clases virtuales: ", prob_beca_virtual, "\n")
+```
+
+```{r}
+# Número de estudiantes que prefieren clases presenciales
+presencial_total <- sum(estudiantes_data$Clases == "Presencial")
+
+# Número de estudiantes con beca y que prefieren clases presenciales
+beca_presencial <- sum(estudiantes_data$Financiacion == "Beca" & estudiantes_data$Clases == "Presencial")
+
+# Calcular la probabilidad condicional
+prob_beca_dado_presencial <- beca_presencial / presencial_total
+cat("Probabilidad de que un estudiante que prefiere clases presenciales tenga beca: ", prob_beca_dado_presencial, "\n")
+```
+
+```{r}
+# Porcentajes de financiamiento
+prob_beca <- 1 - 0.36 - 0.31
+prob_credito <- 0.36
+prob_otro <- 0.31
+
+# Probabilidades de problemas con el pago
+prob_problema_beca <- 0.05
+prob_problema_credito <- 0.02
+prob_problema_otro <- 0.03
+
+# Probabilidad total de tener problemas con el pago
+prob_problema_total <- (prob_problema_beca * prob_beca) + (prob_problema_credito * prob_credito) + (prob_problema_otro * prob_otro)
+cat("Probabilidad de que un estudiante tenga problemas con el pago: ", prob_problema_total, "\n")
+
+# Probabilidad de tener beca dado que tiene problemas con el pago (utilizando el Teorema de Bayes)
+prob_beca_dado_problema <- (prob_problema_beca * prob_beca) / prob_problema_total
+cat("Probabilidad de que un estudiante con problemas con el pago tenga beca: ", prob_beca_dado_problema, "\n")
+```
+
+```         
+            Financiamiento
+            /      |      \
+        Beca    Crédito    Otro
+       /  |      |  \     /  |
+      P   NP    P   NP   P   NP
+```
+
+```{r}
+# I. Tabla de frecuencias relativas para la variable Fuma
+frecuencias_absolutas <- table(estudiantes_data$Fuma)
+frecuencias_relativas <- prop.table(frecuencias_absolutas)
+print(frecuencias_relativas)
+```
+
+```{r}
+# II. Probabilidad de que 10 de 25 estudiantes fumen
+prob_fuma <- frecuencias_relativas["Si"]
+prob_10_de_25 <- dbinom(10, size = 25, prob = prob_fuma)
+cat("Probabilidad de que 10 de 25 estudiantes fumen: ", prob_10_de_25, "\n")
+```
+
+```{r}
+# III. Probabilidad de que a lo más 15 de 30 estudiantes fumen
+prob_a_lo_mas_15_de_30 <- pbinom(15, size = 30, prob = prob_fuma)
+cat("Probabilidad de que a lo más 15 de 30 estudiantes fumen: ", prob_a_lo_mas_15_de_30, "\n")
+
+```
+
+```{r}
+# IV. Número esperado de estudiantes que no fuman
+total_estudiantes <- nrow(estudiantes_data)
+prob_no_fuma <- frecuencias_relativas["No"]
+esperado_no_fuma <- total_estudiantes * prob_no_fuma
+cat("Número esperado de estudiantes que no fuman: ", esperado_no_fuma, "\n")
+
+```
+
+```{r}
+
+# I. Media y desviación estándar poblacional de la variable ingreso
+media_ingreso <- mean(estudiantes_data$Ingreso)
+desviacion_estandar_ingreso <- sd(estudiantes_data$Ingreso)
+
+cat("Media de Ingreso: ", media_ingreso, "\n")
+cat("Desviación Estándar de Ingreso: ", desviacion_estandar_ingreso, "\n")
+```
+
+```{r}
+# II. Probabilidad de que el ingreso sea a lo más de $1.500.000
+# Convertimos 1.500.000 a millones para que coincida con la unidad de la variable
+ingreso_1_5_millones <- 1.5
+prob_ingreso_1_5_millones <- pnorm(ingreso_1_5_millones, mean = media_ingreso, sd = desviacion_estandar_ingreso)
+cat("Probabilidad de que el ingreso sea a lo más de $1.500.000: ", prob_ingreso_1_5_millones, "\n")
+```
+
+```{r}
+ingreso_1_millon <- 1.0
+prob_ingreso_mas_1_millon <- 1 - pnorm(ingreso_1_millon, mean = media_ingreso, sd = desviacion_estandar_ingreso)
+cat("Probabilidad de que el ingreso sea de más de $1.000.000: ", prob_ingreso_mas_1_millon, "\n")
+```
