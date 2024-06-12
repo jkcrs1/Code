@@ -196,6 +196,7 @@ grafico <- function(data, var, tipo_grafico) {
 
 
 
+
 grafico_dispersion <- function(data, var_x, var_y) {
   # Verificar si las variables son numéricas
   if (!is.numeric(data[[var_x]]) || !is.numeric(data[[var_y]])) {
@@ -205,10 +206,14 @@ grafico_dispersion <- function(data, var_x, var_y) {
   # Obtener la paleta de colores
   colores <- paleta_colores()
   
+  # Calcular la covarianza y el coeficiente de correlación
+  covarianza <- cov(data[[var_x]], data[[var_y]], use = "complete.obs")
+  correlacion <- cor(data[[var_x]], data[[var_y]], use = "complete.obs")
+  
   # Crear el gráfico de dispersión
   p <- ggplot(data, aes(x = !!sym(var_x), y = !!sym(var_y))) +
     geom_point(color = colores[1], alpha = 0.6) +
-    geom_smooth(method = "lm", color = colores[2], se = FALSE) + # Añadir línea de tendencia
+    geom_smooth(method = "lm", color = colores[2], se = FALSE, formula = y ~ x) + # Añadir línea de tendencia con fórmula explícita
     theme_minimal() +
     labs(title = paste("Gráfico de Dispersión de", var_x, "vs", var_y),
          x = var_x,
@@ -216,6 +221,11 @@ grafico_dispersion <- function(data, var_x, var_y) {
          caption = paste("Este gráfico de dispersión muestra la relación entre", var_x, "y", var_y, ".")) +
     scale_x_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",")) +
     scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ","))
+  
+  # Añadir anotaciones de covarianza y correlación
+  p <- p + annotate("text", x = Inf, y = Inf, 
+                    label = paste("Covarianza:", round(covarianza, 2), "\nCorrelación:", round(correlacion, 2)),
+                    hjust = 1.1, vjust = 2, size = 5, color = "black", parse = FALSE)
   
   # Mostrar el gráfico
   print(p)
