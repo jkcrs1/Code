@@ -22,6 +22,10 @@ reemplazar_nulos <- function(x) {
   ifelse(x %in% c( "", "NULL", "Null", "null"), NA, x)
 }
 
+reemplazar_por_mediana <- function(x) {
+  x[is.na(x)] <- median(x, na.rm = TRUE)
+  return(x)
+}
 
 paleta_colores <- function() {
   colores <- paletteer::paletteer_d("ggthemes::Classic_10_Light")
