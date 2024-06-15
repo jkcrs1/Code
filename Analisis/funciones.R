@@ -34,7 +34,6 @@ paleta_colores <- function() {
   return(colores)
 }
 
-
 grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
   
   # Verificar que la variable cualitativa sea un factor
@@ -42,9 +41,11 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
     data[[var_cual_x]] <- as.factor(data[[var_cual_x]])
   }
   
+  # Obtener la paleta de colores
+  colores <- paleta_colores()
+  
   # Crear el gráfico base
-  p <- ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) +
-    theme_minimal()
+  p <- ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) 
   
   # Añadir diferentes tipos de gráficos
   p <- switch(tipo_grafico,
@@ -55,9 +56,12 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
                 ggplot(data_pie, aes(x = "", y = percentage, fill = !!sym(var_cual_x))) +
                   geom_bar(stat = "identity", width = 1) +
                   coord_polar("y") +
-                  geom_text(aes(label = scales::percent(percentage)), position = position_stack(vjust = 0.5)) +
+                  geom_text(aes(label = scales::percent(percentage), y = cumsum(percentage) - percentage / 2)) +
                   labs(title = paste("Proporción de categorías de", var_cual_x), x = NULL, y = NULL, caption = paste("Este gráfico de torta muestra la proporción de cada categoría de", var_cual_x, ".")) +
-                  theme_void()
+                  scale_fill_manual(values = colores) +
+                  theme_void() +
+                  theme(legend.position = "right")
+                  theme(legend.background = element_blank())
               },
               "anillo" = {
                 data_pie <- data %>%
@@ -67,31 +71,28 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
                   geom_bar(stat = "identity", width = 1) +
                   coord_polar(theta = "y") +
                   xlim(0.5, 2.5) +
-                  geom_text(aes(label = scales::percent(percentage)), position = position_stack(vjust = 0.5)) +
+                  geom_text(aes(label = scales::percent(percentage), y = cumsum(percentage) - percentage / 2)) +
                   labs(title = paste("Proporción de categorías de", var_cual_x), x = NULL, y = NULL, caption = paste("Este gráfico de anillo muestra la proporción de cada categoría de", var_cual_x, ".")) +
+                  scale_fill_manual(values = colores) +
                   theme_void() +
-                  theme(legend.position = "none",
-                        axis.text = element_blank(),
-                        axis.ticks = element_blank())
+                  theme(legend.position = "right")
               },
-              "barra" = 
+              "barra" = {
                 ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) +
                   geom_bar() +
-                  geom_text(stat='count', aes(label=..count..), angle = 90,  vjust = 0.5) +
-                  labs(title = paste("Frecuencia de", var_cual_x), x = var_cual_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cual_x, "."))+
-                  theme(axis.text.x = element_text(angle = 45, hjust = 0.5)) ,
-              stop(paste(tipo_grafico, " Tipo de gráfico no soportado."))
+                  geom_text(stat='count', aes(label=..count..), angle = 90, vjust = 0.5) +
+                  labs(title = paste("Frecuencia de", var_cual_x), x = var_cual_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cual_x, ".")) +
+                  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #
+                  scale_fill_manual(values = colores) +
+                  theme_void() +
+                  theme(legend.background = element_blank())
+              },
+              stop(paste(tipo_grafico, "Tipo de gráfico no soportado."))
   )
-  
-  # Aplicar tema minimalista y formato de etiquetas en eje y
-  p <- p + theme_minimal() +
-    scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ","))
   
   # Mostrar el gráfico
   print(p)
 }
-
-
 
 
 
