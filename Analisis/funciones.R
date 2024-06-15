@@ -35,43 +35,6 @@ paleta_colores <- function() {
 }
 
 
-grid_plot <- function(..., n = NULL) {
-  plots <- list(...)
-  
-  # Determinar el número de gráficos
-  n_plots <- length(plots)
-  
-  # Verificar que el número de gráficos esté en el rango permitido
-  if (n_plots < 1 || n_plots > 10) {
-    stop("El número de gráficos debe estar entre 1 y 10.")
-  }
-  
-  # Determinar el tamaño de la grilla
-  if (is.null(n)) {
-    if (n_plots <= 2) {
-      nrow <- 1
-      ncol <- n_plots
-    } else if (n_plots <= 4) {
-      nrow <- 2
-      ncol <- 2
-    } else if (n_plots <= 6) {
-      nrow <- 2
-      ncol <- 3
-    } else if (n_plots <= 9) {
-      nrow <- 3
-      ncol <- 3
-    } else {
-      nrow <- 2
-      ncol <- 5
-    }
-  } else {
-    nrow <- n[1]
-    ncol <- n[2]
-  }
-  
-  grid.arrange(grobs = plots, nrow = nrow, ncol = ncol)
-}
-
 grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
   
   # Verificar que la variable cualitativa sea un factor
@@ -111,10 +74,12 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
                         axis.text = element_blank(),
                         axis.ticks = element_blank())
               },
-              "barra" = ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) +
-                geom_bar() +
-                geom_text(stat='count', aes(label=..count..), angle = 90,  vjust = 0.5) +
-                labs(title = paste("Frecuencia de", var_cual_x), x = var_cual_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cual_x, ".")),
+              "barra" = 
+                ggplot(data, aes(x = !!sym(var_cual_x), fill = !!sym(var_cual_x))) +
+                  geom_bar() +
+                  geom_text(stat='count', aes(label=..count..), angle = 90,  vjust = 0.5) +
+                  labs(title = paste("Frecuencia de", var_cual_x), x = var_cual_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cual_x, "."))+
+                  theme(axis.text.x = element_text(angle = 45, hjust = 0.5)) ,
               stop(paste(tipo_grafico, " Tipo de gráfico no soportado."))
   )
   
