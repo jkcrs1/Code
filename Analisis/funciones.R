@@ -23,7 +23,9 @@ reemplazar_nulos <- function(x) {
 }
 
 reemplazar_por_mediana <- function(x) {
-  x[is.na(x)] <- median(x, na.rm = TRUE)
+  if (is.numeric(x) && any(is.na(x))) {
+    x[is.na(x)] <- median(x, na.rm = TRUE)
+  }
   return(x)
 }
 
