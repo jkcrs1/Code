@@ -60,8 +60,8 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
                   labs(title = paste("Proporción de categorías de", var_cual_x), x = NULL, y = NULL, caption = paste("Este gráfico de torta muestra la proporción de cada categoría de", var_cual_x, ".")) +
                   scale_fill_manual(values = colores) +
                   theme_void() +
-                  theme(legend.position = "right")
-                  theme(legend.background = element_blank())
+                 
+                theme(legend.background = element_blank())
               },
               "anillo" = {
                 data_pie <- data %>%
