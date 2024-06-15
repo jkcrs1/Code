@@ -95,7 +95,6 @@ grafico_cualitativo <- function(data, var_cual_x, tipo_grafico) {
 }
 
 
-
 grafico_cuantitativo <- function(data, var_cuant_x, tipo_grafico) {
   # Verificar si la variable es numérica
   if (!is.numeric(data[[var_cuant_x]])) {
@@ -135,29 +134,20 @@ grafico_cuantitativo <- function(data, var_cuant_x, tipo_grafico) {
                 geom_text(stat='count', aes(label=..count..), angle = 90, hjust = -0.1, vjust = 0.5) +
                 scale_fill_gradientn(colors = colores) +
                 labs(title = paste("Distribución de", var_cuant_x), x = var_cuant_x, y = "Frecuencia", caption = paste("Este histograma muestra la distribución de", var_cuant_x, ".")),
-              "densidad" = ggplot(data, aes(x = !!x, fill = ..density..)) +
-                geom_density(alpha = 0.5) +
-                scale_fill_gradientn(colors = colores) +
-                labs(title = paste("Densidad de", var_cuant_x), x = var_cuant_x, y = "Densidad", caption = paste("Este gráfico de densidad muestra la distribución de", var_cuant_x, ".")),
-              "barra" = ggplot(data, aes(x = !!x, fill = !!x)) +
-                geom_bar(stat = "count") +
-                geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
-                scale_fill_manual(values = colores) +
-                labs(title = paste("Frecuencia de", var_cuant_x), x = var_cuant_x, y = "Frecuencia", caption = paste("Este gráfico de barras muestra la frecuencia de", var_cuant_x, ".")),
               "violin" = ggplot(data, aes(x = factor(1), y = !!x)) +
                 geom_violin(aes(fill = factor(1))) +
                 scale_fill_manual(values = colores) +
                 labs(title = paste("Distribución de", var_cuant_x), x = NULL, y = var_cuant_x, caption = paste("Este gráfico de violín muestra la distribución de", var_cuant_x, ".")) +
-                theme(legend.position = "none"),  # Eliminar la leyenda
+                theme(legend.position = "none"),
               "boxplot" = {
-               
+                
                 ggplot(data, aes(x = factor(1), y = !!x)) +
-                  geom_boxplot(alpha = 0.5, outlier.shape = NA, aes(fill = factor(1))) + 
-                  geom_jitter(shape = 16, position = position_jitter(0.2), size = 2, alpha = 0.7) +
+                  geom_boxplot(alpha = 0.5, outlier.shape = NULL, aes(fill = factor(1))) + 
+                  geom_jitter(shape = 10, position = position_jitter(0.15), size = 1, alpha = 0.7) +
                   scale_fill_manual(values = colores) +
                   scale_color_manual(values = colores) +
                   theme_minimal() +
-                  theme(legend.position = "none") +  # Eliminar la leyenda
+                  theme(legend.position = "none") + 
                   annotate("label", x = 1.3, y = stats$Min, label = paste("Min:", round(stats$Min, 2)), hjust = 0, size = 3, fill = "grey90") +
                   annotate("label", x = 1.3, y = stats$Q1, label = paste("Q1:", round(stats$Q1, 2)), hjust = 0, size = 3, fill = "grey90") +
                   annotate("label", x = 1.3, y = stats$Mediana, label = paste("Mediana:", round(stats$Mediana, 2)), hjust = 0, size = 3, fill = "grey90") +
