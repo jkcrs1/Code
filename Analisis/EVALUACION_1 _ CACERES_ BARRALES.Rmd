@@ -75,7 +75,7 @@ dfSummary(estudiantes_total) %>%
   print(method = 'render')
 ```
 
-## Seleccionar Muestra de 150 registros.
+## Muestra de 150 registros.
 
 Seleccionar una muestra aleatoria de 150 registros basada en la desviación estándar. Esta muestra se utilizará para realizar un análisis sobre un conjunto de datos reducido pero que sigue siendo representativo del conjunto de datos original.
 
@@ -89,6 +89,7 @@ set.seed(2)
 cant <- sample(nrow(estudiantes_total), n)
 estudiantes_data <- estudiantes_total[cant, ]
 
+cat("La cantidad de registros de muestra es:", nrow(estudiantes_data))
 ```
 
 ## Normalización de las Variables
@@ -192,7 +193,7 @@ Se realiza un gráfico para cada variable cuantitativa con el fin de explicar su
 
 ```{r}
 var_x <- "Sexo"
-var_tipo_grafico <- "anillo"
+var_tipo_grafico <- "torta"
 
 grafico(
   data = estudiantes_data, 
@@ -263,10 +264,9 @@ Se realiza un gráfico para cada variable cualiativa con el fin de explicar su d
 ### Variable: Ingreso
 
 ```{r}
-data <- estudiantes_data 
 var_x <- "Ingreso"
-
 var_tipo_grafico <- "boxplot"
+
 grafico(
   data = estudiantes_data, 
   var  = var_x, 
@@ -282,12 +282,11 @@ La mediana de los ingresos de los estudiantes es de 1.33 millones de pesos. El r
 ### Variable: Gastos
 
 ```{r}
-data <- estudiantes_data 
 var_x <- "Gastos"
-
 var_tipo_grafico <- "boxplot"
+
 grafico_cuantitativo(
-  data = data, 
+  data = estudiantes_data, 
   var_cuant_x  = var_x, 
   tipo_grafico = var_tipo_grafico
 )
@@ -300,10 +299,9 @@ La mediana de los gastos mensuales de los estudiantes es de 48.9. El rango inter
 ### Variable: Puntaje
 
 ```{r}
-data <- estudiantes_data 
 var_x <- "Puntaje"
-
 var_tipo_grafico <- "boxplot"
+
 grafico(
   data = estudiantes_data, 
   var  = var_x, 
@@ -321,7 +319,6 @@ El gráfico muestra que la mediana de los puntajes de los estudiantes es 26, con
 var_x <- "Gastos"
 var_y <- "Ingreso"
 
-var_tipo_grafico <- "dispercion"
 grafico_dispersion(
   data = estudiantes_data, 
   var_x = var_x, 
@@ -355,7 +352,7 @@ beca_virtual <- sum(estudiantes_data$Financiacion == "Beca" & estudiantes_data$C
 # Calcular la probabilidad
 prob_beca_virtual <- beca_virtual / total_estudiantes
 
-cat("Probabilidad de elegir a un estudiante con beca y que prefiera clases virtuales: ", prob_beca_virtual, "\n")
+cat("Probabilidad de elegir a un estudiante con beca y que prefiera clases virtuales: ", prob_beca_virtual)
 ```
 
 Si se elige a un estudiante al azar que prefiere clases presenciales, ¿Cuál es la probabilidad que el estudiante tenga beca?
@@ -369,7 +366,7 @@ beca_presencial <- sum(estudiantes_data$Financiacion == "Beca" & estudiantes_dat
 
 # Calcular la probabilidad condicional
 prob_beca_dado_presencial <- beca_presencial / presencial_total
-cat("Probabilidad de que un estudiante que prefiere clases presenciales tenga beca: ", prob_beca_dado_presencial, "\n")
+cat("Probabilidad de que un estudiante que prefiere clases presenciales tenga beca: ", prob_beca_dado_presencial)
 
 ```
 
@@ -404,7 +401,7 @@ Determine la probabilidad de que un estudiante tenga problema con el pago.
 ```{r}
 # Probabilidad total de tener problemas con el pago
 prob_problema_total <- (prob_problema_beca * prob_beca) + (prob_problema_credito * prob_credito) + (prob_problema_otro * prob_otro)
-cat("Probabilidad de que un estudiante tenga problemas con el pago: ", prob_problema_total, "\n")
+cat("Probabilidad de que un estudiante tenga problemas con el pago: ", prob_problema_total)
 ```
 
 Si el estudiante tiene problemas con el pago. ¿Cuál es la probabilidad que tenga beca?
@@ -412,7 +409,7 @@ Si el estudiante tiene problemas con el pago. ¿Cuál es la probabilidad que ten
 ```{r}
 # Probabilidad de tener beca dado que tiene problemas con el pago (utilizando el Teorema de Bayes)
 prob_beca_dado_problema <- (prob_problema_beca * prob_beca) / prob_problema_total
-cat("Probabilidad de que un estudiante con problemas con el pago tenga beca: ", prob_beca_dado_problema, "\n")
+cat("Probabilidad de que un estudiante con problemas con el pago tenga beca: ", prob_beca_dado_problema)
 ```
 
 ## Analisis de variable: Fuma
@@ -432,7 +429,7 @@ Si se eligen 25 estudiantes al azar, ¿Cuál es la probabilidad de que 10 de ell
 # Probabilidad de que 10 de 25 estudiantes fumen
 prob_fuma <- frecuencias_relativas["Si"]
 prob_10_de_25 <- dbinom(10, size = 25, prob = prob_fuma)
-cat("Probabilidad de que 10 de 25 estudiantes fumen: ", prob_10_de_25, "\n")
+cat("Probabilidad de que 10 de 25 estudiantes fumen: ", prob_10_de_25)
 ```
 
 Si se eligen 30 estudiantes al azar, ¿Cuál es la probabilidad de que a lo más 15 de ellos si fuma?
@@ -440,7 +437,7 @@ Si se eligen 30 estudiantes al azar, ¿Cuál es la probabilidad de que a lo más
 ```{r}
 # Probabilidad de que a lo más 15 de 30 estudiantes fumen
 prob_a_lo_mas_15_de_30 <- pbinom(15, size = 30, prob = prob_fuma)
-cat("Probabilidad de que a lo más 15 de 30 estudiantes fumen: ", prob_a_lo_mas_15_de_30, "\n")
+cat("Probabilidad de que a lo más 15 de 30 estudiantes fumen: ", prob_a_lo_mas_15_de_30)
 
 ```
 
@@ -451,7 +448,7 @@ Determine el número esperado de estudiante que no fuma.
 total_estudiantes <- nrow(estudiantes_data)
 prob_no_fuma <- frecuencias_relativas["No"]
 esperado_no_fuma <- total_estudiantes * prob_no_fuma
-cat("Número esperado de estudiantes que no fuman: ", esperado_no_fuma, "\n")
+cat("Número esperado de estudiantes que no fuman: ", esperado_no_fuma)
 
 ```
 
@@ -464,8 +461,8 @@ cat("Número esperado de estudiantes que no fuman: ", esperado_no_fuma, "\n")
 media_ingreso <- mean(estudiantes_data$Ingreso)
 desviacion_estandar_ingreso <- sd(estudiantes_data$Ingreso)
 
-cat("Media de Ingreso: ", media_ingreso, "\n")
-cat("Desviación Estándar de Ingreso: ", desviacion_estandar_ingreso, "\n")
+cat("Media de Ingreso: ", media_ingreso)
+cat("Desviación Estándar de Ingreso: ", desviacion_estandar_ingreso)
 ```
 
 ¿Cuál es la probabilidad de que el ingreso sea a lo más de \$1.500.000?
@@ -474,7 +471,7 @@ cat("Desviación Estándar de Ingreso: ", desviacion_estandar_ingreso, "\n")
 # Probabilidad de que el ingreso sea a lo más de $1.500.000
 ingreso_1.5 <- 1.5
 prob_ingreso_1.5 <- pnorm(ingreso_1.5, mean = media_ingreso, sd = desviacion_estandar_ingreso)
-cat("Probabilidad de que el ingreso sea a lo más de $1.500.000: ", prob_ingreso_1.5, "\n")
+cat("Probabilidad de que el ingreso sea a lo más de $1.500.000: ", prob_ingreso_1.5)
 ```
 
 ¿Cuál es la probabilidad de que el ingreso sea de más de \$1.000.000?
@@ -482,5 +479,5 @@ cat("Probabilidad de que el ingreso sea a lo más de $1.500.000: ", prob_ingreso
 ```{r}
 ingreso_1 <- 1.0
 prob_ingreso_1 <- 1 - pnorm(ingreso_1, mean = media_ingreso, sd = desviacion_estandar_ingreso)
-cat("Probabilidad de que el ingreso sea de más de $1.000.000: ", prob_ingreso_1, "\n")
+cat("Probabilidad de que el ingreso sea de más de $1.000.000: ", prob_ingreso_1)
 ```
